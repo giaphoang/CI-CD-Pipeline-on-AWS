@@ -12,7 +12,6 @@ env:
   PRIVATE_SSH_KEY: ${{ secrets.AWS_SSH_KEY_PRIVATE}}
   PUBLIC_SSH_KEY: ${{ secrets.AWS_SSH_KEY_PUBLIC}}
   AWS_REGION: us-east-2
-  KEY_NAME: deployer-key
 
 jobs:
   deploy-infra:
@@ -31,16 +30,12 @@ jobs:
       - name: Terraform Plan
         id: plan
         run: |
-          # Debug: print out the env variables
-          echo "PUBLIC_SSH_KEY: ${PUBLIC_SSH_KEY}"
-          echo "PRIVATE_SSH_KEY: ${PRIVATE_SSH_KEY}"
-          echo "KEY_NAME: ${KEY_NAME}"
           terraform plan \
-            -var="region=us-east-2" \
-            -var="public_key=${PUBLIC_SSH_KEY}" \
-            -var="private_key=${PRIVATE_SSH_KEY}" \
-            -var="key_name=${KEY_NAME}" \
-            -out=PLAN
+          -var="region=us-east-2" \
+          -var="public_key=${PUBLIC_SSH_KEY}" \
+          -var="private_key=${PRIVATE_SSH_KEY}" \
+          -var="key_name=deployer-key" \
+          -out=PLAN
         working-directory: ./terraform
       - name: Terraform Apply
         id: apply
