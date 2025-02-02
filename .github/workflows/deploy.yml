@@ -12,6 +12,7 @@ env:
   PRIVATE_SSH_KEY: ${{ secrets.AWS_SSH_KEY_PRIVATE}}
   PUBLIC_SSH_KEY: ${{ secrets.AWS_SSH_KEY_PUBLIC}}
   AWS_REGION: us-east-2
+  KEY_NAME: deployer-key
 
 jobs:
   deploy-infra:
