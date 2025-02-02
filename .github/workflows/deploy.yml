@@ -46,7 +46,7 @@ jobs:
       - name: Set Output
         id: set-ip
         run: |-
-          echo "::set-putput name=instance_public_ip::${terraform output instance_public_ip}"
+          echo "::set-output name=instance_public_ip::${terraform output instance_public_ip}"
   deploy-app:
     runs-on: ubuntu-latest
     needs: deploy-infra
@@ -67,6 +67,7 @@ jobs:
         run: |-
           docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
           docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+        working-directory: ./app
       - name: Deploy docker image to EC2
         env:
           REGISTRY: ${{steps.login-ecr.outputs.registry}}
