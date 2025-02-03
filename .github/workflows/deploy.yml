@@ -80,12 +80,26 @@ jobs:
           key: ${{env.PRIVATE_SSH_KEY}}
           envs: PRIVATE_SSH_KEY, REGISTRY, REPOSITORY, IMAGE_TAG, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_DEFAULT_REGION, AWS_REGION
           script: |-
-            sudo apt update
-            sudo apt install docker.io -y
-            sudo apt install awscli -y
-            sudo $(aws ecr get-login-password --no-include-email --region us-east-2);
+            # Update package index and install Docker
+            sudo apt-get update
+            sudo apt-get install -y docker.io
+
+            # Install AWS CLI v2 (instead of using apt)
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install
+
+            # Verify installation (optional)
+            aws --version
+
+            # Authenticate Docker to AWS ECR using AWS CLI v2
+            aws ecr get-login-password --region us-east-2 | sudo docker login --username AWS --password-stdin $REGISTRY
+
+            # Stop and remove container if exists (ignore errors if not present)
             sudo docker stop myappcontainer || true
-            sudo docker rm myappcontainer ||true
+            sudo docker rm myappcontainer || true
+
+            # Pull and run your Docker image
             sudo docker pull $REGISTRY/$REPOSITORY:$IMAGE_TAG
             sudo docker run -d --name myappcontainer -p 80:9000 $REGISTRY/$REPOSITORY:$IMAGE_TAG
 
