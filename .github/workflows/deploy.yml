@@ -82,7 +82,7 @@ jobs:
           script: |-
             # Update package index and install Docker
             sudo apt-get update
-            sudo apt-get install -y docker.io
+            sudo apt-get install -y docker.io unzip
 
             # Install AWS CLI v2 (instead of using apt)
             curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
