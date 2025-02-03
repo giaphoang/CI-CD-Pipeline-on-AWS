@@ -83,13 +83,25 @@ jobs:
             sudo apt update
             sudo apt install docker.io -y
 
+            # Fix AWS CLI installation
+            sudo apt install unzip
             curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-            unzip awscliv2.zip
-            sudo ./aws/install
+            unzip -o awscliv2.zip
+            sudo ./aws/install --update
+
+            # Configure AWS credentials
+            mkdir -p ~/.aws
+            echo "[default]
+            aws_access_key_id=$AWS_ACCESS_KEY_ID
+            aws_secret_access_key=$AWS_SECRET_ACCESS_KEY
+            region=$AWS_DEFAULT_REGION" > ~/.aws/credentials
+
+            # Get ECR login token and login to Docker
+            aws ecr get-login-password --region $AWS_DEFAULT_REGION | sudo docker login --username AWS --password-stdin $REGISTRY
             
-            sudo $(aws ecr get-login --no-include-email --region us-east-2);
+            # Deploy container
             sudo docker stop myappcontainer || true
-            sudo docker rm myappcontainer ||true
+            sudo docker rm myappcontainer || true
             sudo docker pull $REGISTRY/$REPOSITORY:$IMAGE_TAG
             sudo docker run -d --name myappcontainer -p 80:9000 $REGISTRY/$REPOSITORY:$IMAGE_TAG
 
